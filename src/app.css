@@ -1,0 +1,489 @@
+@import "./fonts/fonts.css";
+
+/*
+ * Colours from the design (.scratch/moneypenny-v1/design), as light-dark() pairs. color-scheme picks the half:
+ * "light dark" follows the system, and applyAppearance pins it with data-theme for the Light and Dark settings.
+ */
+:root {
+  color-scheme: light dark;
+  --bg: light-dark(#f7f6f2, #141518);
+  --nav-bg: light-dark(#f1efe9, #18191d);
+  /* The sidebar's current item. */
+  --nav-active: light-dark(#ffffff, #25272c);
+  /* The Live Transcript's side panel. */
+  --aside-bg: light-dark(#fbfaf7, #18191d);
+  /* Cards, headers, inputs and dialogs. */
+  --surface: light-dark(#ffffff, #1e2024);
+  --border: light-dark(#e6e3da, #2c2e34);
+  --input-border: light-dark(#d8d4c9, #3a3d44);
+  /* Hover fills and the segmented-tab track. */
+  --hover: light-dark(#edebe4, #2a2c32);
+  --fg: light-dark(#1c1b19, #eceae4);
+  --fg-2: light-dark(#57544d, #b4b0a6);
+  --muted: light-dark(#6b6860, #9a968c);
+  /* Long-form text (Summaries, the Notes preview); dimmer than --fg in dark mode, where full contrast glares. */
+  --reading-fg: light-dark(#1c1b19, #dad7cf);
+  --accent: light-dark(#3b4ba8, #8b98f0);
+  --accent-fg: light-dark(#ffffff, #141518);
+  /* A tile tinted with the accent, such as a Meeting card's icon. */
+  --accent-bg: light-dark(#eceef8, #252a45);
+  /* The dark primary button: near-black in light mode, near-white in dark. */
+  --primary-bg: light-dark(#1c1b19, #eceae4);
+  --primary-fg: light-dark(#ffffff, #141518);
+  --you: light-dark(#3b4ba8, #8b98f0);
+  --others: light-dark(#9a3412, #f0a07a);
+  --ok: light-dark(#1e6b3e, #7bd4a0);
+  --ok-bg: light-dark(#e7f4ec, #173524);
+  --warn-fg: light-dark(#6b3a0a, #f2c27a);
+  --warn-bg: light-dark(#fef3e2, #3a2a12);
+  --notice-bg: var(--warn-bg);
+  --notice-fg: var(--warn-fg);
+  /* Problems and destructive actions; the background and foreground are also the Recording pill's. */
+  --danger: light-dark(#b42318, #f7a39b);
+  --danger-bg: light-dark(#feeceb, #3a1715);
+  --danger-fg: light-dark(#912018, #f7a39b);
+  --rec-dot: light-dark(#d92d20, #f04438);
+  /* The Start recording button. */
+  --record: light-dark(#b42318, #c8261a);
+
+  /* Find's matches (Ctrl+F), and the current one. */
+  --find-bg: light-dark(#fde68a, #5c4813);
+  --find-current-bg: light-dark(#f5a524, #c98a1c);
+  --find-current-fg: light-dark(#1c1b19, #141518);
+
+  --font-serif: "Source Serif 4", Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/*
+ * Sizes are in rem against the design's 14 px base (a design px is 1/14 rem), so they scale with the text size from
+ * Settings. Radii and borders stay in px.
+ */
+html,
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  /* Set from Settings by applyAppearance. rem follows the html size, so the whole UI scales with it. */
+  font: var(--text-size, 15px) / 1.45 var(--text-font, "Inter"), "Inter", system-ui, sans-serif;
+}
+
+h1,
+h2 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+}
+
+/* Times and model names. */
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.93em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+button {
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.64rem 1.14rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--fg);
+}
+
+button:hover:not(:disabled) {
+  background: var(--hover);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+button.primary {
+  background: var(--primary-bg);
+  border-color: var(--primary-bg);
+  color: var(--primary-fg);
+  font-weight: 600;
+}
+
+button.primary:hover:not(:disabled) {
+  background: var(--primary-bg);
+  opacity: 0.88;
+}
+
+/* Start recording. */
+button.record {
+  background: var(--record);
+  border-color: var(--record);
+  color: #fff;
+  font-weight: 600;
+}
+
+button.stop,
+button.danger {
+  background: var(--danger-bg);
+  border-color: var(--danger-bg);
+  color: var(--danger-fg);
+  font-weight: 600;
+}
+
+button.record:hover:not(:disabled),
+button.stop:hover:not(:disabled),
+button.danger:hover:not(:disabled) {
+  filter: brightness(0.94);
+}
+
+button.link,
+button.link:hover:not(:disabled) {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--accent);
+}
+
+/* Find's matches in the Summary, Transcript and Notes preview (find.ts). */
+::highlight(find) {
+  background-color: var(--find-bg);
+}
+
+::highlight(find-current) {
+  background-color: var(--find-current-bg);
+  color: var(--find-current-fg);
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  padding: 0.64rem 0.86rem;
+  border-radius: 10px;
+  border: 1px solid var(--input-border);
+  background: var(--surface);
+  color: var(--fg);
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+/*
+ * Checkboxes and radios are drawn here rather than natively: WebKitGTK's native tick runs past the right edge of its
+ * box and is clipped. The tick is an image, so it can't use light-dark(); --tick swaps it with the theme. The images are
+ * files in public/ because the CSP's img-src doesn't allow data: URLs.
+ */
+:root {
+  --tick: url("/tick-light.svg");
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --tick: url("/tick-dark.svg");
+  }
+}
+
+:root[data-theme="dark"] {
+  --tick: url("/tick-dark.svg");
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  appearance: none;
+  flex: none;
+  width: 1.29rem;
+  height: 1.29rem;
+  padding: 0;
+  border: 1.5px solid var(--input-border);
+  border-radius: 5px;
+  background: var(--surface);
+  vertical-align: -0.3em;
+  cursor: pointer;
+}
+
+input[type="radio"] {
+  border-radius: 50%;
+}
+
+input[type="checkbox"]:checked {
+  border-color: var(--accent);
+  background: var(--tick) center / 100% no-repeat, var(--accent);
+}
+
+input[type="radio"]:checked {
+  border-color: var(--accent);
+  background: radial-gradient(circle, var(--accent-fg) 0 26%, var(--accent) 30%);
+}
+
+input[type="checkbox"]:disabled,
+input[type="radio"]:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* The global :focus-visible ring, which input:focus-visible turns off in favour of the text-field glow. */
+input[type="checkbox"]:focus-visible,
+input[type="radio"]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+dialog {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--fg);
+  padding: 1.43rem 1.71rem;
+  box-shadow: 0 12px 40px rgb(0 0 0 / 0.18);
+}
+
+dialog::backdrop {
+  background: rgb(0 0 0 / 0.4);
+}
+
+/* A message across a view: .problem, .warn or .ok; plain is neutral. */
+.callout {
+  padding: 0.71rem 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--fg);
+  line-height: 1.5;
+}
+
+.callout.warn {
+  border-color: transparent;
+  background: var(--warn-bg);
+  color: var(--warn-fg);
+}
+
+.callout.ok {
+  border-color: transparent;
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+
+.callout.problem {
+  border-color: transparent;
+  background: var(--danger-bg);
+  color: var(--danger-fg);
+}
+
+/* A small rounded label, such as a Meeting's status: .ok, .warn or .rec; plain is neutral. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.43rem;
+  height: 1.86rem;
+  padding: 0 0.71rem;
+  border-radius: 999px;
+  background: var(--hover);
+  color: var(--fg-2);
+  font-size: 0.86rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.chip.ok {
+  background: var(--ok-bg);
+  color: var(--ok);
+}
+
+.chip.warn {
+  background: var(--warn-bg);
+  color: var(--warn-fg);
+}
+
+.chip.rec {
+  background: var(--danger-bg);
+  color: var(--danger-fg);
+  font-weight: 600;
+}
+
+.chip.rec::before {
+  content: "";
+  width: 0.57rem;
+  height: 0.57rem;
+  border-radius: 50%;
+  background: var(--rec-dot);
+}
+
+/* A Meeting's Tag: a topic rather than a state, so squarer than the status chips and in the accent colour. */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  height: 1.57rem;
+  padding: 0 0.57rem;
+  border: none;
+  border-radius: 6px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-size: 0.79rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+button.tag:hover:not(:disabled) {
+  background: var(--accent-bg);
+  text-decoration: underline;
+}
+
+/* Three pulsing dots beside a working message, in the text colour. */
+.dots {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.dots span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: fade 1.2s ease-in-out infinite;
+}
+
+.dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes fade {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dots span {
+    animation: none;
+  }
+  .dots span:nth-child(2) {
+    opacity: 0.6;
+  }
+  .dots span:nth-child(3) {
+    opacity: 0.3;
+  }
+}
+
+/* A segmented control: buttons on a tinted track, the current one (.active or aria-selected) raised on the surface. */
+.segmented {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--hover);
+}
+
+.segmented > button {
+  height: 2.57rem;
+  padding: 0 1.14rem;
+  border: none;
+  border-radius: 9px;
+  background: none;
+  color: var(--fg-2);
+}
+
+.segmented > button:hover:not(:disabled) {
+  background: none;
+  color: var(--fg);
+}
+
+.segmented > button.active,
+.segmented > button[aria-selected="true"],
+.segmented > button.active:hover:not(:disabled),
+.segmented > button[aria-selected="true"]:hover:not(:disabled) {
+  background: var(--surface);
+  color: var(--fg);
+  box-shadow: 0 1px 2px rgb(28 27 25 / 0.08);
+}
+
+/* While a Divider is dragged (Divider.svelte): its cursor everywhere, and no text selection. */
+:root[data-resizing="col"],
+:root[data-resizing="col"] * {
+  cursor: col-resize !important;
+  user-select: none;
+}
+
+:root[data-resizing="row"],
+:root[data-resizing="row"] * {
+  cursor: row-resize !important;
+  user-select: none;
+}
+
+/* Rendered Markdown (renderMarkdown): Summaries and the Notes preview. */
+.markdown {
+  color: var(--reading-fg);
+  font-size: 1.07rem;
+  line-height: 1.7;
+}
+
+.markdown h1,
+.markdown h2,
+.markdown h3 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.markdown h2,
+.markdown h3 {
+  margin: 1.71rem 0 0.43rem;
+  font-size: 1.21rem;
+}
+
+.markdown h4,
+.markdown h5,
+.markdown h6 {
+  margin: 1.14rem 0 0.29rem;
+  font-size: 1rem;
+  color: var(--fg);
+}
+
+.markdown ul {
+  margin: 0.29rem 0;
+  padding-left: 1.43rem;
+}
+
+.markdown p {
+  margin: 0.86rem 0;
+}
+
+.markdown code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+}
+
+.markdown a {
+  color: var(--accent);
+}

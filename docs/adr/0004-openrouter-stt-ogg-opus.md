@@ -1,0 +1,7 @@
+# OpenRouter transcription endpoint with OGG/Opus Chunks, ZDR-only providers
+
+Chunks go to OpenRouter's dedicated `/api/v1/audio/transcriptions` endpoint rather than to an audio-capable chat model. We always request `response_format: "verbose_json"` with `timestamp_granularities: ["word"]`, and build Segments ourselves from the words, splitting at pauses. Providers segment very differently: ElevenLabs and AssemblyAI return one segment per Chunk, while Whisper and Deepgram return many. All four tested return word timestamps, and word timing is what overlap dedupe and echo dedupe match on. If a provider rejects `verbose_json`, we fall back to `json` and estimate timestamps from the Chunk's start.
+
+Chunks are 16 kHz mono Opus in an OGG container at about 24 kbps, and language is always `en`. In the spike (issue 01), OGG/Opus was accepted by every model tested and was as accurate as FLAC at about 1/5 the size. That matters for upload bandwidth during a call, not for the 25 MB cap. Each model has a format setting with FLAC as the fallback.
+
+Only zero-data-retention (ZDR) providers are used, enforced by the OpenRouter account guardrail. That rules out OpenAI-hosted models such as `whisper-1`. The default model is `elevenlabs/scribe-v2`, which was the most accurate in the spike, including on short interjections, at about $0.22/hr for both Tracks. The alternatives offered are `openai/whisper-large-v3-turbo` (non-OpenAI hosted, about $0.02/hr) and `deepgram/nova-3` (about 0.4 s latency).

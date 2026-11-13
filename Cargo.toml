@@ -1,0 +1,13 @@
+[workspace]
+resolver = "2"
+members = ["crates/core", "src-tauri"]
+
+[workspace.package]
+edition = "2021"
+version = "0.6.5"
+license = "MIT"
+
+# Shows the tray tooltip on Linux; see vendor/tray-icon/PATCHED.md.
+[patch.crates-io]
+tray-icon = { path = "vendor/tray-icon" }
+libappindicator = { path = "vendor/libappindicator" }

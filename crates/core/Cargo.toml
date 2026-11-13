@@ -1,0 +1,30 @@
+[package]
+name = "tiro-core"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+
+[dependencies]
+async-trait = "0.1"
+base64 = "0.22"
+chrono = { version = "0.4", features = ["serde"] }
+hound = "3.5"
+ogg = "0.9"
+opus = "0.3"
+# Silero VAD. ONNX Runtime is downloaded at build time and linked statically.
+ort = { version = "=2.0.0-rc.14", default-features = false, features = ["std", "download-binaries", "tls-rustls", "api-24"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+rusqlite = { version = "0.32", features = ["bundled"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+thiserror = "2"
+tokio = { version = "1", features = ["rt", "macros", "sync", "time", "fs"] }
+tracing = "0.1"
+# Lossy WebP for Meeting screenshots. Builds its own libwebp, so there is no system library to install.
+webp = { version = "0.3.1", default-features = false }
+
+[dev-dependencies]
+tempfile = "3"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "time", "test-util"] }
+wiremock = "0.6"

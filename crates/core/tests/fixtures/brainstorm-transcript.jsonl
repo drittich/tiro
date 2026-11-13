@@ -1,0 +1,33 @@
+{"track": "others", "start": 2.0, "end": 13.02, "text": "Okay, I think everyone's here. So today is mostly a brainstorm, no pressure to decide anything. Three things on my list: onboarding, the offsite, and the release notes mess."}
+{"track": "you", "start": 14.22, "end": 18.4, "text": "Sounds good. Let's start with onboarding, that's the one bugging me."}
+{"track": "others", "start": 19.6, "end": 26.44, "text": "Right. So the drop-off after signup is still bad. Something like sixty percent never create a second project."}
+{"track": "you", "start": 27.64, "end": 37.9, "text": "One idea I had is an interactive checklist in the sidebar. Create a project, invite a teammate, connect a repo. You tick them off as you go."}
+{"track": "others", "start": 39.1, "end": 45.56, "text": "I like that. What about a video walkthrough instead? Like a two minute tour on first login."}
+{"track": "you", "start": 46.76, "end": 55.12, "text": "We tried videos at my last job. The problem is they go stale every time the UI changes, and nobody re-records them."}
+{"track": "others", "start": 56.32, "end": 63.54, "text": "Yeah, that's fair. Maintenance cost is real. Let's park the video idea, at least until the UI settles down."}
+{"track": "others", "start": 64.74, "end": 71.96, "text": "Another angle: a sandbox workspace that's pre-filled with sample data, so people can poke around without setting anything up."}
+{"track": "you", "start": 73.16, "end": 81.9, "text": "Ooh. That might actually beat the checklist for people who just want to look. Though seeding realistic sample data is its own project."}
+{"track": "others", "start": 83.1, "end": 93.36, "text": "This is half-baked, but what if we paired new teams with a buddy from the community forum? Like an experienced user who checks in after a week."}
+{"track": "you", "start": 94.56, "end": 102.92, "text": "Interesting. I don't know how we'd recruit buddies, or what's in it for them. Maybe swag, maybe early access. Worth thinking about."}
+{"track": "others", "start": 104.12, "end": 107.54, "text": "Let's not decide. Checklist feels cheapest to try though."}
+{"track": "you", "start": 108.74, "end": 115.58, "text": "Agreed, I'd be happy to mock up the checklist this week so we have something to look at."}
+{"track": "others", "start": 116.78, "end": 121.72, "text": "Great. Okay, offsite. We said spring. I threw Lisbon out there last time."}
+{"track": "you", "start": 122.92, "end": 129.0, "text": "Lisbon is lovely, but half the team is in Canada and flights in April are expensive."}
+{"track": "others", "start": 130.2, "end": 134.76, "text": "Someone suggested a cabin in Vermont. Cheap, driveable for most of us."}
+{"track": "you", "start": 135.96, "end": 146.98, "text": "The Vermont cabin is cheaper for the Canadian folks but it's a long haul for the two people in Berlin. So it just flips who pays the travel cost."}
+{"track": "others", "start": 148.18, "end": 156.16, "text": "True. What if we skip travel entirely and do a fully remote hackathon week instead? Ship weird stuff, demo on Friday."}
+{"track": "you", "start": 157.36, "end": 164.58, "text": "I kind of love that, but people specifically asked for in-person time. A remote hackathon doesn't really replace that."}
+{"track": "others", "start": 165.78, "end": 174.9, "text": "Maybe both. Hackathon in spring, in-person in the fall when flights are cheaper. Let's not lock it now, I'll need to check budget first."}
+{"track": "you", "start": 176.1, "end": 178.76, "text": "Do we know the budget at all?"}
+{"track": "others", "start": 179.96, "end": 184.14, "text": "Not yet. Finance said they'd tell us by end of month."}
+{"track": "others", "start": 185.34, "end": 190.66, "text": "Last one: release notes. Right now it's whoever remembers, writing them the night before."}
+{"track": "you", "start": 191.86, "end": 194.52, "text": "Could we auto-generate them from commit messages?"}
+{"track": "others", "start": 195.72, "end": 203.32, "text": "We tried that in the old repo. Our commit messages are like 'fix stuff' and 'wip'. The output was useless."}
+{"track": "you", "start": 204.52, "end": 210.6, "text": "Fair, so that's out unless we enforce conventional commits, and nobody wants that fight right now."}
+{"track": "others", "start": 211.8, "end": 219.02, "text": "What about having each PR include a one-line user-facing note in the template, and then we just collect them?"}
+{"track": "you", "start": 220.22, "end": 225.16, "text": "That's better. Low effort per PR. The risk is people leave it blank."}
+{"track": "others", "start": 226.36, "end": 237.0, "text": "We could have a bot nag on PRs without it. Or even have a language model draft the note from the diff and the author just edits it."}
+{"track": "you", "start": 238.2, "end": 248.46, "text": "The model draft is neat but I'd want to see how often it's wrong before we trust it. The PR template line is the safe first step."}
+{"track": "others", "start": 249.66, "end": 257.64, "text": "Okay. So nothing decided on the bot, but I'll add the release-note line to the PR template, since that's basically free."}
+{"track": "you", "start": 258.84, "end": 264.92, "text": "Works for me. Open question for me is who actually owns publishing the notes each release."}
+{"track": "others", "start": 266.12, "end": 271.44, "text": "Yeah, good question, we'll need to figure that out. Okay, that's time. Thanks everyone."}

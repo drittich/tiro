@@ -1,0 +1,30 @@
+//! Pure core of Tiro: everything that can be tested without PipeWire, Tauri or the network.
+
+pub mod acks;
+pub mod ask;
+pub mod assembler;
+pub mod autostart;
+pub mod chunker;
+pub mod detection;
+pub mod echo;
+pub mod embeddings;
+pub mod encoder;
+pub mod export;
+pub mod interleaver;
+pub mod keyfile;
+pub mod openrouter;
+pub mod pipeline;
+pub mod queue;
+pub mod rename;
+pub mod retry;
+pub mod screenshots;
+pub mod search;
+pub mod spend;
+pub mod store;
+pub mod summary;
+pub mod tags;
+pub mod transcriber;
+pub mod transcript;
+pub mod transcript_builder;
+pub mod vad;
+pub mod xdg;

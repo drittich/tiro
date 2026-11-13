@@ -1,0 +1,27 @@
+[package]
+name = "tiro"
+description = "Tray app that records, transcribes and summarizes online meetings"
+edition.workspace = true
+version.workspace = true
+license.workspace = true
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+chrono = "0.4"
+# Already linked by Tauri (tao) on Linux; used for KWin and desktop notifications.
+dbus = "0.9"
+# Already linked by Tauri (tao) on Linux; used to name the app for the window manager.
+glib = "0.18"
+libc = "0.2"
+# Already linked by tauri-plugin-dialog; used for the "already running" message before Tauri starts.
+rfd = { version = "0.16", default-features = false, features = ["gtk3"] }
+tiro-core = { path = "../crates/core" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tauri = { version = "2", features = ["tray-icon", "image-png"] }
+tauri-plugin-dialog = "2"
+tokio = { version = "1", features = ["rt", "sync"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
