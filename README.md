@@ -4,7 +4,19 @@ A tray app for Fedora KDE Plasma that records online meetings as two Tracks (You
 
 ## Install
 
-### Build and install
+### From a release
+
+Download the RPM from the [latest release](https://github.com/drittich/tiro/releases/latest), then install it:
+
+```sh
+sudo dnf install ./Tiro-0.6.6-1.x86_64.rpm
+```
+
+The RPM pulls in `opus`, PipeWire (`pipewire`, `pipewire-libs`, `pipewire-utils`) and `pulseaudio-utils` (for `pactl`). The Silero VAD model is built into the binary, so there is nothing else to download. See [Which systems it runs on](#which-systems-it-runs-on) before installing on anything other than Fedora KDE Plasma.
+
+Start **Tiro** from the application launcher. To start it at login, tick **Start Tiro when I log in** in Settings: this writes `~/.config/autostart/tiro.desktop`, which starts Tiro in the tray without opening its window. Untick it to remove the file.
+
+### Build from source
 
 You need Node.js, Rust (`cargo`, usually in `~/.cargo/bin`), `rpm-build` and `opus-devel`. From the repo root:
 
@@ -16,16 +28,27 @@ scripts/build-rpm.sh
 The script asks whether to raise the minor version, builds the RPM, and prints the command to install it, for example:
 
 ```sh
-sudo dnf install ./target/release/bundle/rpm/Tiro-0.1.2-1.x86_64.rpm
+sudo dnf install ./target/release/bundle/rpm/Tiro-0.6.6-1.x86_64.rpm
 ```
 
-See [Versions](#versions) for how the version changes on each build. The RPM pulls in `opus`, PipeWire (`pipewire`, `pipewire-libs`, `pipewire-utils`) and `pulseaudio-utils` (for `pactl`). The Silero VAD model is built into the binary, so there is nothing else to download.
+See [Versions](#versions) for how the version changes on each build.
 
-Start **Tiro** from the application launcher. To start it at login, tick **Start Tiro when I log in** in Settings: this writes `~/.config/autostart/tiro.desktop`, which starts Tiro in the tray without opening its window. Untick it to remove the file.
+### Which systems it runs on
+
+Tiro has been tested only on **Fedora 44 and 45 with KDE Plasma 6, on x86_64**. The release RPM is built on Fedora and names Fedora's packages as dependencies.
+
+| System | Status |
+|---|---|
+| Fedora 44 or 45, KDE Plasma 6 | Tested. Install the release RPM. |
+| Other Fedora-based KDE systems (e.g. Fedora Kinoite with `rpm-ostree install`) | Should work with the release RPM, but untested. |
+| Fedora with another desktop (GNOME, etc.) | Untested. Recording, transcription and summaries need only PipeWire, but browser meeting detection and screenshots need KWin, so they won't work. GNOME needs the AppIndicator extension to show the tray icon. |
+| Other RPM distros (openSUSE, RHEL and its rebuilds) | The release RPM won't install as is, because its dependencies use Fedora's package names. Build from source. Untested. |
+| Debian, Ubuntu, Arch and others | No package. Building from source may work where the requirements below are met, but it's untested. |
+| ARM (aarch64) | No release build. |
 
 ### Update
 
-Quit Tiro from its tray menu, build again with `scripts/build-rpm.sh`, and install the new RPM with the command it prints. Each build has a new version, so `dnf install` upgrades the installed one. Your settings and Meetings are kept.
+Quit Tiro from its tray menu, then install the newer RPM the same way, either downloaded from [Releases](https://github.com/drittich/tiro/releases) or built with `scripts/build-rpm.sh`. Each version has a new number, so `dnf install` upgrades the installed one. Your settings and Meetings are kept.
 
 ### Upgrading from moneypenny
 
@@ -93,7 +116,8 @@ In **Meetings**, hover over a Meeting and choose **Rename** or **Delete**. You c
 
 ## Requirements
 
-- Fedora 44 with PipeWire (`pw-record`, `pw-dump`, `pactl`) and KDE Plasma 6 (KWin, for window titles)
+- Linux with PipeWire (`pw-record`, `pw-dump`, `pactl`); tested on Fedora 44 and 45
+- KDE Plasma 6 (KWin) for browser meeting detection and screenshots
 - `opus-devel` to build
 - An OpenRouter API key in `~/.config/tiro/openrouter.key` (mode `0600`), which you can set in Settings
 
@@ -114,3 +138,7 @@ cargo test
 The `ort` crate downloads ONNX Runtime from `cdn.pyke.io` during the first build and caches it in `~/.cache/ort.pyke.io`, so building needs network access once. To build offline, point `ORT_LIB_LOCATION` at a local static ONNX Runtime build.
 
 Set `TIRO_LIVE_TESTS=1` to also run the test that calls OpenRouter.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
