@@ -9,7 +9,7 @@ A tray app for Fedora KDE Plasma that records online meetings as two Tracks (You
 Download the RPM from the [latest release](https://github.com/drittich/tiro/releases/latest), then install it:
 
 ```sh
-sudo dnf install ./Tiro-0.6.6-1.x86_64.rpm
+sudo dnf install ./Tiro-0.8.0-1.x86_64.rpm
 ```
 
 The RPM pulls in `opus`, PipeWire (`pipewire`, `pipewire-libs`, `pipewire-utils`) and `pulseaudio-utils` (for `pactl`). The Silero VAD model is built into the binary, so there is nothing else to download. See [Which systems it runs on](#which-systems-it-runs-on) before installing on anything other than Fedora KDE Plasma.
@@ -28,7 +28,7 @@ scripts/build-rpm.sh
 The script asks whether to raise the minor version, builds the RPM, and prints the command to install it, for example:
 
 ```sh
-sudo dnf install ./target/release/bundle/rpm/Tiro-0.6.6-1.x86_64.rpm
+sudo dnf install ./target/release/bundle/rpm/Tiro-0.8.0-1.x86_64.rpm
 ```
 
 See [Versions](#versions) for how the version changes on each build.

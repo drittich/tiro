@@ -4,7 +4,7 @@ members = ["crates/core", "src-tauri"]
 
 [workspace.package]
 edition = "2021"
-version = "0.7.1"
+version = "0.8.0"
 license = "MIT"
 
 # Shows the tray tooltip on Linux; see vendor/tray-icon/PATCHED.md.
