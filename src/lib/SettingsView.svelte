@@ -1,7 +1,7 @@
 <script lang="ts">
   import { listen } from "@tauri-apps/api/event";
   import { ask } from "@tauri-apps/plugin-dialog";
-  import { api, EVENTS, formatUsd, type Microphone, type SettingsView, type SpendSummary, type Theme } from "./api";
+  import { api, EVENTS, formatUsd, type Microphone, type SettingsView, type SpendSummary, type Theme, type UpdateStatus } from "./api";
   import { applyAppearance, BUNDLED_FONTS } from "./appearance";
 
   // ZDR-eligible models from the spike (issue 01). Any OpenRouter transcription model ID can be typed in.
@@ -28,6 +28,10 @@
   let fonts = $state<string[]>([]);
   let message = $state<{ ok: boolean; text: string } | null>(null);
   let spend = $state<SpendSummary | null>(null);
+  let checkForUpdates = $state(true);
+  let updates = $state<UpdateStatus | null>(null);
+  let updatesProblem = $state<string | null>(null);
+  let copied = $state(false);
 
   // Everything the Save button writes, so the save bar can tell when something has changed.
   const snapshot = () =>
@@ -50,6 +54,7 @@
       summaryPrompt = v.summaryPrompt ?? v.defaultSummaryPrompt;
       autostart = v.autostart;
       meetingScreenshots = v.meetingScreenshots;
+      checkForUpdates = v.checkForUpdates;
       ({ textFont, textSize, notesFont, notesSize, theme } = v);
       saved = snapshot();
     });
@@ -68,6 +73,36 @@
     const unlisten = listen(EVENTS.spend, loadSpend);
     return () => void unlisten.then((f) => f());
   });
+
+  const loadUpdates = () => api.updateStatus().then((u) => (updates = u));
+
+  $effect(() => {
+    loadUpdates();
+    const unlisten = listen(EVENTS.update, loadUpdates);
+    return () => void unlisten.then((f) => f());
+  });
+
+  /** Saved at once, apart from the Save button. */
+  async function toggleUpdates(event: Event) {
+    const enabled = (event.currentTarget as HTMLInputElement).checked;
+    updatesProblem = null;
+    try {
+      checkForUpdates = (await api.setCheckForUpdates(enabled)).checkForUpdates;
+    } catch (e) {
+      checkForUpdates = !enabled;
+      updatesProblem = String(e);
+    }
+  }
+
+  async function copyCommand(command: string) {
+    try {
+      await navigator.clipboard.writeText(command);
+      copied = true;
+      setTimeout(() => (copied = false), 2000);
+    } catch {
+      copied = false;
+    }
+  }
 
   const monthName = (year: number, month: number) =>
     new Date(year, month - 1).toLocaleDateString(undefined, { month: "long", year: "numeric" });
@@ -165,6 +200,44 @@
             {#if screenshotsProblem}<p class="problem">{screenshotsProblem}</p>{/if}
           </div>
         </div>
+      </section>
+
+      <section class="card" aria-labelledby="s-updates">
+        <header>
+          <h2 id="s-updates">Updates</h2>
+          <p>{updates ? `This is Tiro ${updates.current}.` : ""} New versions are published as releases on GitHub.</p>
+        </header>
+        <div class="checks">
+          <div class="check-row">
+            <label class="check">
+              <span class="text">
+                <span class="label">Check for updates</span>
+                <span class="hint">At startup and once a day. Saved as soon as you change it. When off, Tiro never contacts GitHub.</span>
+              </span>
+              <input type="checkbox" checked={checkForUpdates} onchange={toggleUpdates} />
+            </label>
+            {#if updatesProblem}<p class="problem">{updatesProblem}</p>{/if}
+          </div>
+        </div>
+        {#if updates?.available}
+          <div class="available">
+            <span>Tiro {updates.available} is available.</span>
+            <button type="button" onclick={() => api.installUpdate()} disabled={updates.busy}>
+              {updates.busy ? "Updating…" : "Update…"}
+            </button>
+          </div>
+          {#if updates.manualCommand}
+            <div class="callout warn manual" role="alert">
+              <p>The update was downloaded but couldn't be installed through the system's password prompt. Quit Tiro, then run:</p>
+              <div class="command">
+                <code>{updates.manualCommand}</code>
+                <button type="button" onclick={() => updates?.manualCommand && copyCommand(updates.manualCommand)}>
+                  {copied ? "Copied" : "Copy"}
+                </button>
+              </div>
+            </div>
+          {/if}
+        {/if}
       </section>
 
       <section class="card" aria-labelledby="s-openrouter">
@@ -418,6 +491,29 @@
   }
   .check-row .problem {
     margin: -0.57rem 0 1.14rem;
+  }
+  .available {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.14rem;
+  }
+  .available button,
+  .command button {
+    flex: none;
+  }
+  .manual p {
+    margin: 0 0 0.71rem;
+  }
+  .command {
+    display: flex;
+    align-items: center;
+    gap: 0.86rem;
+  }
+  .command code {
+    flex: 1;
+    min-width: 0;
+    user-select: all;
   }
   .months {
     display: flex;

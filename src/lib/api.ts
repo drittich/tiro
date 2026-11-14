@@ -251,6 +251,22 @@ export interface SettingsView {
   meetingScreenshots: boolean;
   /** How the last export with Screenshots included them; preselected next time. */
   exportScreenshots: ScreenshotsMode;
+  /** Whether Tiro asks GitHub for newer releases; when off it makes no requests there. */
+  checkForUpdates: boolean;
+  /** The last release the user was notified about. */
+  announcedVersion: string | null;
+}
+
+/** Matches `UpdateStatus` in src-tauri/src/updates.rs. */
+export interface UpdateStatus {
+  /** The running version. */
+  current: string;
+  /** A newer release's version, if one is available. */
+  available: string | null;
+  /** Downloading or installing it. */
+  busy: boolean;
+  /** The command to install it from a terminal, once the system's privilege prompt couldn't. */
+  manualCommand: string | null;
 }
 
 /** Matches `Theme` in src-tauri/src/settings.rs. */
@@ -285,6 +301,11 @@ export const api = {
   ) => invoke<SettingsView>("save_summary_settings", { summaryModel, summaryPrompt, displayName, embeddingModel, askModel }),
   setAutostart: (enabled: boolean) => invoke<SettingsView>("set_autostart", { enabled }),
   setMeetingScreenshots: (enabled: boolean) => invoke<SettingsView>("set_meeting_screenshots", { enabled }),
+  updateStatus: () => invoke<UpdateStatus>("update_status"),
+  /** Off stops all requests to GitHub; on checks now. */
+  setCheckForUpdates: (enabled: boolean) => invoke<SettingsView>("set_check_for_updates", { enabled }),
+  /** Downloads the available release and offers to install it; nothing happens while a Meeting records. */
+  installUpdate: () => invoke<void>("install_update"),
   /** Installed font families, sorted. */
   listFonts: () => invoke<string[]>("list_fonts"),
   saveAppearance: (appearance: Appearance) => invoke<SettingsView>("save_appearance", { ...appearance }),
@@ -348,6 +369,8 @@ export const EVENTS = {
   indexing: "indexing",
   /** Payload: an `EmbeddingProgress`. */
   embedding: "embedding",
+  /** The update status changed; reload it with `api.updateStatus`. */
+  update: "update",
 } as const;
 
 /** Served by src-tauri/src/screenshot_protocol.rs. */

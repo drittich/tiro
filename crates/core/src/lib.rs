@@ -25,5 +25,6 @@ pub mod tags;
 pub mod transcriber;
 pub mod transcript;
 pub mod transcript_builder;
+pub mod update;
 pub mod vad;
 pub mod xdg;

@@ -7,6 +7,7 @@ use tiro_core::embeddings::DEFAULT_EMBEDDING_MODEL;
 use tiro_core::export::ScreenshotsMode;
 use tiro_core::openrouter::DEFAULT_STT_MODEL;
 use tiro_core::summary::{SummarySettings, DEFAULT_PROMPT_TEMPLATE, DEFAULT_SUMMARY_MODEL};
+use tiro_core::update::Version;
 use tiro_core::xdg::{self, home};
 use serde::{Deserialize, Serialize};
 
@@ -42,6 +43,12 @@ pub struct Settings {
     /// Whether a recording Meeting captures screenshots of the meeting app's window. Only turned on after the
     /// user accepts the consent dialog in Settings.
     pub meeting_screenshots: bool,
+    /// Whether Tiro asks GitHub for newer releases; when off, it makes no requests there.
+    pub check_for_updates: bool,
+    /// The last release the user was notified about, so each is announced once. One that can't be read is
+    /// forgotten rather than losing every other setting.
+    #[serde(deserialize_with = "lenient_version")]
+    pub announced_version: Option<Version>,
 }
 
 /// The app's colours: whichever the system prefers, or always light or dark.
@@ -76,6 +83,8 @@ impl Default for Settings {
             notes_size: 14,
             theme: Theme::default(),
             meeting_screenshots: false,
+            check_for_updates: true,
+            announced_version: None,
         }
     }
 }
@@ -94,6 +103,10 @@ impl Settings {
     }
 }
 
+fn lenient_version<'de, D: serde::Deserializer<'de>>(deserializer: D) -> Result<Option<Version>, D::Error> {
+    Ok(Option::<serde_json::Value>::deserialize(deserializer)?.and_then(|v| serde_json::from_value(v).ok()))
+}
+
 fn path() -> PathBuf {
     xdg::config_home().join("tiro").join("settings.json")
 }
@@ -106,6 +119,16 @@ pub fn load() -> Settings {
         }),
         Err(_) => Settings::default(),
     }
+}
+
+/// Loads, changes and saves the settings, one writer at a time. For writers off the UI's command path, such as the
+/// update check, whose saves could otherwise interleave with each other's.
+pub fn update(change: impl FnOnce(&mut Settings)) -> std::io::Result<()> {
+    static WRITING: std::sync::Mutex<()> = std::sync::Mutex::new(());
+    let _writing = WRITING.lock().unwrap_or_else(std::sync::PoisonError::into_inner);
+    let mut settings = load();
+    change(&mut settings);
+    save(&settings)
 }
 
 pub fn save(settings: &Settings) -> std::io::Result<()> {
@@ -226,6 +249,30 @@ mod tests {
         let saved = serde_json::to_string(&Settings { ask_model: String::new(), ..Settings::default() }).unwrap();
         let settings: Settings = serde_json::from_str(&saved).unwrap();
         assert_eq!(settings.ask_model, "");
+    }
+
+    #[test]
+    fn settings_saved_before_update_checks_check_for_updates_and_have_announced_nothing() {
+        let settings: Settings = serde_json::from_str(r#"{"displayName":"Darcy"}"#).unwrap();
+        assert!(settings.check_for_updates);
+        assert_eq!(settings.announced_version, None);
+        let saved = serde_json::to_string(&Settings {
+            check_for_updates: false,
+            announced_version: Some("0.8.0".parse().unwrap()),
+            ..Settings::default()
+        })
+        .unwrap();
+        let settings: Settings = serde_json::from_str(&saved).unwrap();
+        assert!(!settings.check_for_updates);
+        assert!(saved.contains(r#""announcedVersion":"0.8.0""#));
+        assert_eq!(settings.announced_version, Some("0.8.0".parse().unwrap()));
+    }
+
+    #[test]
+    fn an_unreadable_announced_version_is_forgotten_and_the_other_settings_kept() {
+        let settings: Settings = serde_json::from_str(r#"{"displayName":"Darcy","announcedVersion":"soon"}"#).unwrap();
+        assert_eq!(settings.announced_version, None);
+        assert_eq!(settings.display_name, "Darcy");
     }
 
     #[test]

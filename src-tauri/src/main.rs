@@ -17,6 +17,7 @@ mod settings;
 mod single_instance;
 mod streams;
 mod tray;
+mod updates;
 mod window_state;
 
 use std::sync::{Arc, Mutex};
@@ -77,6 +78,7 @@ fn main() {
             }
         })
         .manage(window_state::Tracked::default())
+        .manage(updates::Updates::default())
         .manage(AppState {
             store,
             spend: Arc::new(SpendLedger::new(data.join("spend.jsonl"))),
@@ -109,6 +111,7 @@ fn main() {
             app.state::<AppState>().store.on_indexed(move |id| embedding::enqueue(&handle, [id.to_owned()]));
             embedding::spawn_worker(app.handle().clone());
             search::index_in_background(app.handle().clone());
+            updates::spawn(app.handle().clone());
             Ok(())
         })
         .on_window_event(|window, event| {
@@ -154,6 +157,9 @@ fn main() {
             commands::ask_off,
             commands::ask,
             commands::new_conversation,
+            commands::update_status,
+            commands::set_check_for_updates,
+            commands::install_update,
         ])
         .build(tauri::generate_context!())
         .expect("build the Tauri app")

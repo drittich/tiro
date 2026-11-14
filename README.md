@@ -48,7 +48,9 @@ Tiro has been tested only on **Fedora 44 and 45 with KDE Plasma 6, on x86_64**. 
 
 ### Update
 
-Quit Tiro from its tray menu, then install the newer RPM the same way, either downloaded from [Releases](https://github.com/drittich/tiro/releases) or built with `scripts/build-rpm.sh`. Each version has a new number, so `dnf install` upgrades the installed one. Your settings and Meetings are kept.
+Tiro checks GitHub for a newer release at startup and once a day, and notifies you once per new version (never during a Meeting). Choose **Update to …** in the tray menu, or **Update…** in the notification or in Settings: Tiro downloads the RPM to your Downloads folder and installs it through the system's password prompt. Then quit Tiro and start it again. If the password prompt can't install it, Settings shows the `sudo dnf install …` command to run instead. Turn off **Check for updates** in Settings to stop all requests to GitHub.
+
+To update by hand, quit Tiro from its tray menu, then install the newer RPM the same way, either downloaded from [Releases](https://github.com/drittich/tiro/releases) or built with `scripts/build-rpm.sh`. Each version has a new number, so `dnf install` upgrades the installed one. Your settings and Meetings are kept.
 
 ### Uninstall
 

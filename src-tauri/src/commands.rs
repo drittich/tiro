@@ -22,6 +22,7 @@ use crate::embedding::{self, EmbeddingProgress};
 use crate::recorder::{self, AppState};
 use crate::settings::{self, Settings, Theme};
 use crate::jobs;
+use crate::updates::{self, UpdateStatus};
 
 /// The Meeting `meeting_id`, with the error as the UI shows it.
 fn meeting(state: &AppState, meeting_id: &str) -> Result<Meeting, String> {
@@ -234,6 +235,25 @@ pub fn set_meeting_screenshots(enabled: bool) -> Result<SettingsView, String> {
     settings::save(&Settings { meeting_screenshots: enabled, ..settings::load() })
         .map_err(|e| format!("could not save settings: {e}"))?;
     Ok(get_settings())
+}
+
+/// The running version, any newer release, and the command to install it by hand if the privilege prompt could not.
+#[tauri::command]
+pub fn update_status(app: AppHandle) -> UpdateStatus {
+    updates::status(&app)
+}
+
+/// Turns the update check on (checking now) or off (no more requests to GitHub).
+#[tauri::command]
+pub fn set_check_for_updates(app: AppHandle, enabled: bool) -> Result<SettingsView, String> {
+    updates::set_enabled(&app, enabled).map_err(|e| format!("could not save settings: {e}"))?;
+    Ok(get_settings())
+}
+
+/// Downloads the newer release and offers to install it, as the tray's "Update to …" does.
+#[tauri::command]
+pub fn install_update(app: AppHandle) {
+    updates::install(&app);
 }
 
 /// Writes or removes `~/.config/autostart/tiro.desktop`.
