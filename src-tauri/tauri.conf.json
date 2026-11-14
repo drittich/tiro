@@ -22,7 +22,6 @@
     "linux": {
       "rpm": {
         "depends": ["opus", "pipewire", "pipewire-libs", "pipewire-utils", "pulseaudio-utils"],
-        "obsoletes": ["moneypenny"],
         "desktopTemplate": "tiro.desktop"
       }
     },

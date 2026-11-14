@@ -18,4 +18,4 @@ Taking the title from the KWin window caption is a different idea. Detection alr
 
 ## Prior requests
 
-- `.scratch/moneypenny-v1/issues/18-title-from-first-screenshot.md`: "Suggest a Meeting title from the first screenshot"
+- `.scratch/tiro-v1/issues/18-title-from-first-screenshot.md`: "Suggest a Meeting title from the first screenshot"

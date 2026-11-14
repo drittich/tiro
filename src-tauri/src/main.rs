@@ -52,10 +52,6 @@ fn main() {
         return;
     };
 
-    if let Err(e) = rename::move_from_moneypenny(&xdg::config_home(), &xdg::data_home()) {
-        tracing::warn!("could not move moneypenny's files to Tiro's folders: {e}");
-    }
-
     let data = settings::data_dir();
     let store = Arc::new(MeetingStore::open(&data.join("meetings"), &data.join("index.sqlite")).expect("open the Meeting store"));
     // The index is only a cache of the folders (ADR-0005), so refresh it on every launch.

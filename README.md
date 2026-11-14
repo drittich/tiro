@@ -50,10 +50,6 @@ Tiro has been tested only on **Fedora 44 and 45 with KDE Plasma 6, on x86_64**. 
 
 Quit Tiro from its tray menu, then install the newer RPM the same way, either downloaded from [Releases](https://github.com/drittich/tiro/releases) or built with `scripts/build-rpm.sh`. Each version has a new number, so `dnf install` upgrades the installed one. Your settings and Meetings are kept.
 
-### Upgrading from moneypenny
-
-Tiro used to be called moneypenny. Quit moneypenny from its tray menu first, then install Tiro as above: installing the `tiro` package removes the `moneypenny` one. On first launch, Tiro moves your settings, API key and Meetings from `~/.config/moneypenny` and `~/.local/share/moneypenny` to `~/.config/tiro` and `~/.local/share/tiro`, and replaces a moneypenny login autostart entry with its own.
-
 ### Uninstall
 
 ```sh

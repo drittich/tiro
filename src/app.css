@@ -1,7 +1,7 @@
 @import "./fonts/fonts.css";
 
 /*
- * Colours from the design (.scratch/moneypenny-v1/design), as light-dark() pairs. color-scheme picks the half:
+ * Colours from the design (.scratch/tiro-v1/design), as light-dark() pairs. color-scheme picks the half:
  * "light dark" follows the system, and applyAppearance pins it with data-theme for the Light and Dark settings.
  */
 :root {
