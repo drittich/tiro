@@ -15,7 +15,6 @@ pub mod keyfile;
 pub mod openrouter;
 pub mod pipeline;
 pub mod queue;
-pub mod rename;
 pub mod retry;
 pub mod screenshots;
 pub mod search;

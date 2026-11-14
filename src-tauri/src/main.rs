@@ -22,7 +22,6 @@ mod window_state;
 use std::sync::{Arc, Mutex};
 
 use tiro_core::acks::Acks;
-use tiro_core::{rename, xdg};
 use tiro_core::spend::SpendLedger;
 use tiro_core::store::MeetingStore;
 use tauri::{Emitter, Manager, WindowEvent};
