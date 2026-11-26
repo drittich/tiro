@@ -130,6 +130,7 @@ fn main() {
             commands::list_meetings,
             commands::transcript,
             commands::meeting_screenshots,
+            commands::delete_screenshot,
             commands::get_settings,
             commands::save_settings,
             commands::list_microphones,

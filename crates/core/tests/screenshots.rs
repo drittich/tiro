@@ -368,6 +368,38 @@ fn only_a_listed_screenshot_of_a_meeting_can_be_looked_up_by_name() {
     assert!(store.screenshot("no-such-meeting", "00000-000001500.webp").is_err());
 }
 
+#[test]
+fn deleting_a_screenshot_removes_its_file_and_leaves_the_others() {
+    let (_dir, store, meeting) = store();
+    let shots = meeting.dir.join("screenshots");
+    tiro_core::screenshots::mark_thinned(&meeting.dir).unwrap();
+    for name in ["00000-000001500.webp", "00001-000004000.webp"] {
+        std::fs::write(shots.join(name), b"x").unwrap();
+    }
+
+    assert!(store.delete_screenshot(&meeting.id, "00000-000001500.webp").unwrap());
+
+    let left: Vec<String> = store.screenshots(&meeting).unwrap().iter().map(|s| s.file_name()).collect();
+    assert_eq!(left, ["00001-000004000.webp"]);
+    assert!(shots.join(".thinned").exists(), "the thinned marker stays, so thinning never runs again");
+    assert!(!store.delete_screenshot(&meeting.id, "00000-000001500.webp").unwrap(), "already gone");
+}
+
+#[test]
+fn only_a_listed_screenshot_of_a_meeting_can_be_deleted() {
+    let (_dir, store, meeting) = store();
+    let shots = meeting.dir.join("screenshots");
+    std::fs::create_dir(&shots).unwrap();
+    std::fs::write(shots.join("stray.webp"), b"x").unwrap();
+    std::fs::write(meeting.dir.join("00000-000001500.webp"), b"x").unwrap();
+
+    assert!(!store.delete_screenshot(&meeting.id, "stray.webp").unwrap());
+    assert!(!store.delete_screenshot(&meeting.id, "../00000-000001500.webp").unwrap());
+    assert!(store.delete_screenshot("..", "00000-000001500.webp").is_err());
+    assert!(shots.join("stray.webp").exists());
+    assert!(meeting.dir.join("00000-000001500.webp").exists());
+}
+
 /// Screenshots at these Meeting times, in order.
 fn shots_at(times: &[u64]) -> Vec<Screenshot> {
     times.iter().enumerate().map(|(i, &ms)| Screenshot { index: i as u32, ms, path: file_name(i as u32, ms).into() }).collect()

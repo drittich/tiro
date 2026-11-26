@@ -325,6 +325,14 @@ impl MeetingStore {
         Ok(screenshots::list(&dir)?.into_iter().find(|s| s.file_name() == file_name))
     }
 
+    /// Deletes the Screenshot of Meeting `id` with this file name, for good. Only ever a file the listing returns, as
+    /// in [`Self::screenshot`]. Returns whether there was one to delete. The `.thinned` marker stays.
+    pub fn delete_screenshot(&self, id: &str, file_name: &str) -> Result<bool> {
+        let Some(screenshot) = self.screenshot(id, file_name)? else { return Ok(false) };
+        fs::remove_file(&screenshot.path)?;
+        Ok(true)
+    }
+
     /// The folder of Meeting `id`, refusing ids that are not a single folder name.
     fn meeting_dir(&self, id: &str) -> Result<PathBuf> {
         if !matches!(Path::new(id).components().collect::<Vec<_>>()[..], [Component::Normal(_)]) {

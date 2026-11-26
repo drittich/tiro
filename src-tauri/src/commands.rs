@@ -100,6 +100,22 @@ pub fn meeting_screenshots(state: State<'_, AppState>, meeting_id: String) -> Re
         .collect())
 }
 
+/// Deletes one of the Meeting's Screenshots for good. Refused until the Meeting has stopped, since capture may still
+/// be writing to `screenshots/`.
+#[tauri::command]
+pub fn delete_screenshot(state: State<'_, AppState>, meeting_id: String, file: String) -> Result<(), String> {
+    let recording = state.active.lock().unwrap().as_ref().is_some_and(|a| a.meeting.id == meeting_id);
+    let status = meeting(&state, &meeting_id)?.status;
+    if recording || matches!(status, MeetingStatus::Recording | MeetingStatus::Transcribing) {
+        return Err("Wait until the Meeting has stopped and its Transcript is finished.".into());
+    }
+    match state.store.delete_screenshot(&meeting_id, &file) {
+        Ok(true) => Ok(()),
+        Ok(false) => Err("That Screenshot is no longer there.".into()),
+        Err(e) => Err(format!("could not delete the Screenshot: {e}")),
+    }
+}
+
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SettingsView {

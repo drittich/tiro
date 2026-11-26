@@ -14,6 +14,7 @@
     pending,
     reveal = null,
     revealMs = null,
+    ondeleteshot,
   }: {
     segments: Segment[];
     follow?: boolean;
@@ -27,6 +28,8 @@
     reveal?: ScreenshotView | null;
     /** A Meeting time in ms to scroll to, such as a search result's: the row of the Segment starting there. */
     revealMs?: number | null;
+    /** Offered as "Delete" in the full-size viewer; see `ScreenshotViewer`'s `ondelete`. */
+    ondeleteshot?: (shot: ScreenshotView) => Promise<ScreenshotView | null | undefined>;
   } = $props();
 
   const PANEL_KEY = "tiro.screenshotPanelCollapsed";
@@ -212,6 +215,11 @@
     show(e.currentTarget.valueAsNumber);
   }
 
+  // A deleted last Screenshot leaves the panel on the one before it.
+  $effect(() => {
+    if (screenshots.length && current >= screenshots.length) current = screenshots.length - 1;
+  });
+
   const inPanel = $derived(screenshots[current] ?? screenshots[0]);
 
   // The tallest Screenshot that leaves the bar above it and the Transcript below it room.
@@ -317,7 +325,7 @@
     {@render transcript()}
   </div>
 
-  <ScreenshotViewer {meetingId} bind:this={viewer} />
+  <ScreenshotViewer {meetingId} ondelete={ondeleteshot} bind:this={viewer} />
 {:else}
   {@render transcript()}
 {/if}

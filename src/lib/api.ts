@@ -288,6 +288,8 @@ export const api = {
   transcript: (meetingId: string) => invoke<Segment[]>("transcript", { meetingId }),
   /** The Meeting's Screenshots by time, placed in the Transcript `transcript` returns. */
   screenshots: (meetingId: string) => invoke<ScreenshotView[]>("meeting_screenshots", { meetingId }),
+  /** Deletes one Screenshot's file for good; refused until the Meeting has stopped. */
+  deleteScreenshot: (meetingId: string, file: string) => invoke<void>("delete_screenshot", { meetingId, file }),
   getSettings: () => invoke<SettingsView>("get_settings"),
   saveSettings: (sttModel: string, mic: string | null, apiKey: string | null) =>
     invoke<SettingsView>("save_settings", { sttModel, mic, apiKey }),

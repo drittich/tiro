@@ -4,10 +4,16 @@
   let {
     meetingId,
     onjump,
+    ondelete,
   }: {
     meetingId: string;
     /** Offered as "Jump to Transcript" when set: shows that Screenshot's place in the Transcript. */
     onjump?: (shot: ScreenshotView) => void;
+    /**
+     * Offered as "Delete" when set: asks, deletes the Screenshot, and resolves to the one to show instead, null when
+     * none are left, or undefined when it was kept.
+     */
+    ondelete?: (shot: ScreenshotView) => Promise<ScreenshotView | null | undefined>;
   } = $props();
 
   let viewer: HTMLDialogElement | undefined = $state();
@@ -29,6 +35,15 @@
     viewer?.close();
     if (shot) onjump?.(shot);
   }
+
+  async function remove() {
+    const shot = viewing;
+    if (!shot || !ondelete) return;
+    const next = await ondelete(shot);
+    if (next === undefined || viewing !== shot) return;
+    if (next) viewing = next;
+    else viewer?.close();
+  }
 </script>
 
 <dialog class="viewer" bind:this={viewer} onclick={onViewerClick} onclose={() => (viewing = null)}>
@@ -37,6 +52,7 @@
     <p>
       Screenshot at {clock(viewing.ms / 1000)} · Esc to close
       {#if onjump}· <button class="link" onclick={jump}>Jump to Transcript</button>{/if}
+      {#if ondelete}· <button class="link" onclick={remove}>Delete</button>{/if}
     </p>
   {/if}
 </dialog>

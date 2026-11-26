@@ -1,7 +1,7 @@
 <script lang="ts">
   import { tick, untrack } from "svelte";
   import { listen } from "@tauri-apps/api/event";
-  import { save } from "@tauri-apps/plugin-dialog";
+  import { ask, save } from "@tauri-apps/plugin-dialog";
   import {
     api,
     clock,
@@ -33,6 +33,7 @@
     ondelete,
     onback,
     ontag,
+    onscreenshots,
     at = null,
   }: {
     meeting: Meeting;
@@ -44,6 +45,8 @@
     onback?: () => void;
     /** Adds this Tag to the Meetings list's search. */
     ontag?: (tag: string) => void;
+    /** A Screenshot was deleted, so the Meeting's card may show another or none. */
+    onscreenshots?: (meeting: Meeting) => void;
   } = $props();
 
   let tab = $state<"summary" | "transcript" | "screenshots">("summary");
@@ -259,6 +262,33 @@
         message = { ok: false, text: event.message };
         break;
     }
+  }
+
+  /**
+   * Asks, then deletes the Screenshot for good. Resolves to the Screenshot that took its place (the next one, or the
+   * one before when it was the last), null when none are left, or undefined when it was kept.
+   */
+  async function deleteShot(shot: ScreenshotView): Promise<ScreenshotView | null | undefined> {
+    const sure = await ask(`Delete the Screenshot at ${clock(shot.ms / 1000)}? It is removed for good.`, {
+      title: "Delete Screenshot",
+      kind: "warning",
+      okLabel: "Delete",
+      cancelLabel: "Keep",
+    });
+    if (!sure) return undefined;
+    const id = meeting.id;
+    try {
+      await api.deleteScreenshot(id, shot.file);
+    } catch (e) {
+      message = { ok: false, text: String(e) };
+      return undefined;
+    }
+    if (id !== meeting.id) return undefined;
+    const i = screenshots.findIndex((s) => s.file === shot.file);
+    screenshots = screenshots.filter((s) => s.file !== shot.file);
+    if (reveal?.file === shot.file) reveal = null;
+    onscreenshots?.(meeting);
+    return screenshots[Math.min(Math.max(i, 0), screenshots.length - 1)] ?? null;
   }
 
   function jumpToTranscript(shot: ScreenshotView) {
@@ -606,7 +636,7 @@
           </div>
         {:else if tab === "transcript"}
           <div class="transcript-tab" role="tabpanel" aria-label="Transcript">
-            <TranscriptView {segments} meetingId={meeting.id} {screenshots} {reveal} {revealMs} />
+            <TranscriptView {segments} meetingId={meeting.id} {screenshots} {reveal} {revealMs} ondeleteshot={deleteShot} />
           </div>
         {:else}
           <div class="gallery-scroll" role="tabpanel" aria-label="Screenshots">
@@ -618,6 +648,9 @@
                       <img src={screenshotUrl(meeting.id, shot)} alt="" loading="lazy" />
                       <time data-nofind>{clock(shot.ms / 1000)}</time>
                     </button>
+                    <button class="danger delete" onclick={() => deleteShot(shot)} aria-label="Delete screenshot at {clock(shot.ms / 1000)}">
+                      Delete
+                    </button>
                   </li>
                 {/each}
               </ul>
@@ -625,7 +658,7 @@
               <p class="empty" data-nofind>No Screenshots.</p>
             {/if}
           </div>
-          <ScreenshotViewer meetingId={meeting.id} onjump={jumpToTranscript} bind:this={viewer} />
+          <ScreenshotViewer meetingId={meeting.id} onjump={jumpToTranscript} ondelete={deleteShot} bind:this={viewer} />
         {/if}
       </div>
     {/snippet}
@@ -878,6 +911,22 @@
     grid-template-columns: repeat(auto-fill, minmax(max(min(100%, 16rem), calc((100% - 1.14rem) / 2)), 1fr));
     gap: 1.14rem;
     max-width: 68rem;
+  }
+  .gallery li {
+    position: relative;
+  }
+  /* Over the tile's corner, shown while the tile is hovered or focused. */
+  .gallery .delete {
+    position: absolute;
+    top: 0.57rem;
+    right: 0.57rem;
+    padding: 0.14rem 0.57rem;
+    font-size: 0.86rem;
+    opacity: 0;
+  }
+  .gallery li:hover .delete,
+  .gallery li:focus-within .delete {
+    opacity: 1;
   }
   .gallery .shot {
     position: relative;

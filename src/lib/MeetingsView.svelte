@@ -470,6 +470,7 @@
       else selected = null;
     }}
     ontag={filterBy}
+    onscreenshots={refresh}
   />
 {:else}
   <section class="home">
