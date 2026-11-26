@@ -6,7 +6,7 @@ Issues are tracked as local markdown files under `.scratch/<feature>/`. See `doc
 
 ### Triage labels
 
-Default five-label vocabulary (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+Default five-label vocabulary (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`) plus a local `on-hold` for parked tickets. See `docs/agents/triage-labels.md`.
 
 ### Domain docs
 
